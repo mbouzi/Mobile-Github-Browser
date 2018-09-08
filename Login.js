@@ -11,6 +11,8 @@ import {
 	ActivityIndicator
 } from 'react-native'
 
+import buffer from 'buffer'
+
 
 
 export default class Login extends Component {
@@ -27,21 +29,34 @@ export default class Login extends Component {
 		console.log("Attempted Login " + this.state.username)
 		this.setState({showProgress: true})
 
-		fetch('https://api.github.com/search/repositories?q=react')
-		.then((response) => {
-			return response.json();
-		})
-		.then((results) => {
-			console.log(results);
-			this.setState({showProgress: false});
-		})
-		.catch((error)=> {
-     		console.log("Api call error");
-     		alert(error.message);
-  		});
+		let authService = require('./AuthService')
+
+		authService.login({
+			username: this.state.username,
+			password: this.state.password
+		}, (results) => {
+			this.setState(Object.assign({
+				showProgress: false
+			}, results));
+		});
 	}
 
 	render() {
+
+		let errorCtrl = <View />;
+
+		if(!this.state.success && this.state.badCredentials) {
+			errorCtrl = <Text style={styles.error}>
+				That username and password combinatoin did not work
+				</Text>;
+		}
+
+		if(!this.state.success && this.state.unknownError) {
+			errorCtrl = <Text style={styles.error}>
+				That username and password combinatoin did not work
+				</Text>;
+		}
+
 		return (
 			<View style={styles.container}>
 				<Image 
@@ -70,6 +85,10 @@ export default class Login extends Component {
 						Log in 
 					</Text>
 				</TouchableHighlight>
+
+
+				{errorCtrl}
+
 				<ActivityIndicator
 					animating={this.state.showProgress}
 					size="large"
@@ -119,5 +138,9 @@ const styles = StyleSheet.create({
 	},
 	loader: {
 		marginTop: 20
+	},
+	error: {
+		color: "red",
+		paddingTop: 10
 	}
 })
