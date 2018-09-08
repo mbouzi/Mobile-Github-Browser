@@ -1,12 +1,45 @@
 'use strict';
 
 import React, {Component} from 'react';
-import {Text, View, StyleSheet, Image, TextInput, TouchableHighlight} from 'react-native'
+import {
+	Text, 
+	View, 
+	StyleSheet, 
+	Image, 
+	TextInput, 
+	TouchableHighlight, 
+	ActivityIndicator
+} from 'react-native'
 
-type Props = {};
 
 
-export default class Login extends Component<Props> {
+export default class Login extends Component {
+
+	constructor(props) {
+		super(props);
+
+		this.state = {
+			showProgress: false
+		}
+	}
+
+	onLoginPressed() {
+		console.log("Attempted Login " + this.state.username)
+		this.setState({showProgress: true})
+
+		fetch('https://api.github.com/search/repositories?q=react')
+		.then((response) => {
+			return response.json();
+		})
+		.then((results) => {
+			console.log(results);
+			this.setState({showProgress: false});
+		})
+		.catch((error)=> {
+     		console.log("Api call error");
+     		alert(error.message);
+  		});
+	}
 
 	render() {
 		return (
@@ -18,22 +51,30 @@ export default class Login extends Component<Props> {
 				<Text styles={styles.heading}>
 					Github Browser
 				</Text>
-				<TextInput 
+				<TextInput
+					onChangeText={(text) => this.setState({username: text})} 
 					style={styles.input}
 					placeholder="Github username"
 				/>
 				<TextInput 
+					onChangeText={(text) => this.setState({password: text})} 
 					style={styles.input}
 					placeholder="Github password"
 					secureTextEntry="true"
 				/>
 				<TouchableHighlight
+					onPress={this.onLoginPressed.bind(this)}
 					style={styles.button}
 				>
 					<Text style={styles.buttonText}>
 						Log in 
 					</Text>
 				</TouchableHighlight>
+				<ActivityIndicator
+					animating={this.state.showProgress}
+					size="large"
+					style={styles.loader}
+				/>
 			</View>
 		)
 	}
@@ -75,5 +116,8 @@ const styles = StyleSheet.create({
 		fontSize: 22,
 		color: "#fff",
 		alignSelf: 'center'
+	},
+	loader: {
+		marginTop: 20
 	}
 })
