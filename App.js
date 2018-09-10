@@ -7,26 +7,67 @@
  */
 
 import React, {Component} from 'react';
-import {Platform, StyleSheet, Text, View} from 'react-native';
+import {Platform, StyleSheet, Text, View, ActivityIndicator} from 'react-native';
 
 import Login from './Login'
+import AuthService from './AuthService'
 
-const instructions = Platform.select({
-  ios: 'Press Cmd+R to reload,\n' + 'Cmd+D or shake for dev menu',
-  android:
-    'Double tap R on your keyboard to reload,\n' +
-    'Shake or press menu button for dev menu',
-});
+export default class App extends Component {
 
-type Props = {};
-export default class App extends Component<Props> {
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      isLoggedIn: false,
+      checkAuth: true
+    }
+  }
+
+  componentDidMount() {
+    AuthService.getAuthInfo((err, authInfo) => {
+      this.setState({
+        checkAuth: false,
+        isLoggedIn: authInfo != null
+      })
+    })
+  }
+
+  onLogin() {
+    this.setState({
+      isLoggedIn: true
+    })
+  }
+
   render() {
 
     let message = 'hello haan'
 
-    return (
-      <Login />
-    );
+    console.log("CHECKED", this.state.checkAuth)
+    console.log("LOGGED:", this.state.isLoggedIn)
+
+    if(this.state.checkAuth) {
+      return (
+        <View style={styles.container}>
+          <ActivityIndicator
+            animating={true}
+            size="large"
+            style={styles.loader}
+          />
+        </View>
+      )
+    }
+
+     if(this.state.isLoggedIn) {
+      return (
+        <View style={styles.container}>
+          <Text style={styles.welcome}> Logged In</Text>
+        </View>
+      )
+    } else {
+      return (
+        <Login onLogin={this.onLogin.bind(this)} />
+      );
+    }
   }
 }
 
