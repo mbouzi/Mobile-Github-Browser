@@ -9,8 +9,10 @@
 import React, {Component} from 'react';
 import {Platform, StyleSheet, Text, View, ActivityIndicator} from 'react-native';
 
-import Login from './Login'
+import AppContainer from './AppContainer'
 import AuthService from './AuthService'
+
+import Login from './Login'
 
 export default class App extends Component {
 
@@ -42,8 +44,6 @@ export default class App extends Component {
 
     let message = 'hello haan'
 
-    console.log("CHECKED", this.state.checkAuth)
-    console.log("LOGGED:", this.state.isLoggedIn)
 
     if(this.state.checkAuth) {
       return (
@@ -59,9 +59,7 @@ export default class App extends Component {
 
      if(this.state.isLoggedIn) {
       return (
-        <View style={styles.container}>
-          <Text style={styles.welcome}> Logged In</Text>
-        </View>
+        <AppContainer />
       )
     } else {
       return (
